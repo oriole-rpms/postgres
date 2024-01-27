@@ -1,0 +1,47 @@
+name: Release workflow for tagged versions
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  postgres:
+    permissions:
+      packages: write
+      contents: write
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # skipping 12, no tag for
+        osrelease:
+          - rockylinux8
+          - rockylinux9
+          - fedora38
+          - fedora39
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@main
+
+      - name: 'Login to GitHub Container Registry'
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: 'Build rpms'
+        run: |
+          docker-compose run pgbuilder
+        env:
+          PGGITTAG: ${{ github.ref }}
+          IMAGETAG: ${{ matrix.osrelease }}
+
+      - name: Add to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            oriolepg/rpms/*.rpm
+            LICENSE
+            README.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

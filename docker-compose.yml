@@ -1,0 +1,13 @@
+version: '3'
+services:
+  pgbuilder:
+    image: ghcr.io/oriole-rpms/pgbuilder:${IMAGETAG}
+    command:
+      - bash
+      - -c
+      - cd /host/oriolepg && make
+    environment:
+      PGGITTAG: ${PGGITTAG}
+    #platform: linux/amd64
+    volumes:
+    - ./:/host
