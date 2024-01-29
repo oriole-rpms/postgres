@@ -10,5 +10,5 @@ build:
 	rpmbuild -ba "./postgresql.spec"
 
 copy:
-	mkdir rpms
+	mkdir -p rpms
 	find ~/rpmbuild -name '*.rpm' -exec cp {} rpms/ \;
