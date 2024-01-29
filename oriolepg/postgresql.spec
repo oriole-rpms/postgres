@@ -1334,7 +1334,7 @@ fi
 %{pgbaseinstdir}/bin/pg_upgrade
 %{pgbaseinstdir}/bin/pg_verifybackup
 %{pgbaseinstdir}/bin/postgres
-%if 0%{?pgmajorversion} < 15
+%if 0%{?pgmajorversion} <= 15
 %{pgbaseinstdir}/bin/postmaster
 %endif
 %{pgbaseinstdir}/share/man/man1/initdb.*
@@ -1351,7 +1351,7 @@ fi
 %{pgbaseinstdir}/share/man/man1/pg_verifybackup.*
 %{pgbaseinstdir}/share/man/man1/pg_waldump.1
 %{pgbaseinstdir}/share/man/man1/postgres.*
-%if 0%{?pgmajorversion} < 15
+%if 0%{?pgmajorversion} <= 15
 %{pgbaseinstdir}/share/man/man1/postmaster.*
 %endif
 %{pgbaseinstdir}/share/postgres.bki
