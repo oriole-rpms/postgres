@@ -1,2 +1,2 @@
-# images
-All images used to build oriolepg rpms
+# postgres
+Building orioledb postgres with the lines required to run the orioledb extension
