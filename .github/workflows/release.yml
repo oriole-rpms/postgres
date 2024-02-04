@@ -5,6 +5,22 @@ on:
       - created
 
 jobs:
+  generic:
+    permissions:
+      packages: write
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@main
+
+      - name: Add LICENSE and README.md
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            LICENSE
+            README.md
+
   postgres:
     permissions:
       packages: write
@@ -42,7 +58,13 @@ jobs:
         with:
           files: |
             oriolepg/rpms/*.rpm
-            LICENSE
-            README.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Build oriolepg image'
+        run: |
+          docker build . --build-arg="IMAGETAG=${{ matrix.osrelease }}" --tag oriolepg
+          docker tag oriolepg "ghcr.io/oriole-rpms/oriolepg:${{ github.ref_name }}-${{ matrix.osrelease }}"
+
+      - name: 'Push to ghcr.io'
+        run: docker push -a ghcr.io/oriole-rpms/oriolepg
