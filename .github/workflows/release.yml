@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@main
 
       - name: Add LICENSE and README.md
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             LICENSE
@@ -54,7 +54,7 @@ jobs:
           IMAGETAG: ${{ matrix.osrelease }}
 
       - name: Add to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             oriolepg/rpms/*.rpm
