@@ -1,0 +1,3 @@
+[submodule "oriolepg/postgres"]
+	path = oriolepg/postgres
+	url = https://github.com/orioledb/postgres.git
