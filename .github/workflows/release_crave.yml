@@ -1,0 +1,59 @@
+name: Release workflow for tagged versions
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  generic:
+    permissions:
+      packages: write
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@main
+
+      - name: Add LICENSE and README.md
+        uses: softprops/action-gh-release@v3
+        with:
+          files: |
+            LICENSE
+            README.md
+
+  postgres:
+    runs-on: self-hosted
+
+    permissions:
+      packages: write
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # skipping 12, no tag for
+        osrelease:
+          - rockylinux8
+          - rockylinux9
+    steps:
+
+      - name: Destroy previous clone
+        run: crave clone destroy -y /crave-devspaces/pipeline/runs/${GITHUB_RUN_ID}_${GITHUB_RUN_NUMBER} || echo "Clone did not exist"
+        continue-on-error: true
+      - name: Crave clone sources
+        run: crave clone create --projectID 76 /crave-devspaces/pipeline/runs/${GITHUB_RUN_ID}_${GITHUB_RUN_NUMBER}
+      - name: Checkout the correct branch
+        run: |
+          git -C /crave-devspaces/pipeline/runs/${GITHUB_RUN_ID}_${GITHUB_RUN_NUMBER} --recurse-submodules fetch origin ${GITHUB_REF}:${GITHUB_REF}
+          git -C /crave-devspaces/pipeline/runs/${GITHUB_RUN_ID}_${GITHUB_RUN_NUMBER} --recurse-submodules checkout ${GITHUB_REF}
+      - name: Initialize, build, test
+        run: |
+          cd /crave-devspaces/pipeline/runs/${GITHUB_RUN_ID}_${GITHUB_RUN_NUMBER}/oriolepg
+          crave run --clean make
+      - name: Delete Clone
+        run: crave clone destroy -y /crave-devspaces/pipeline/runs/${GITHUB_RUN_ID}_${GITHUB_RUN_NUMBER}
+
+      # Todo:
+      # - Checkout correct tag of submodule
+      # - Run on rocky image
+      # - Upload artifacts
